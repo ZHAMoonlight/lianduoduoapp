@@ -591,7 +591,7 @@ td strong { color: #51485f; }
 .settings-list > div > span:nth-child(2) { flex: 1; }
 .settings-list p { max-width: 670px; }
 .toast > button { background: transparent; border: 0; color: #b597c8; padding: 0 0 0 10px; display: inline-flex; }
-dialog.modal { inset: 0; width: 520px; height: auto; max-width: calc(100vw - 40px); max-height: 90vh; border: 0; border-radius: 12px; background: #fff; margin: auto; padding: 0; display: block; overflow-y: auto; box-shadow: 0 25px 90px #35234333; animation: toast-in .18s ease-out; backdrop-filter: none; }
+dialog.modal { inset: 0; width: 520px; height: fit-content; min-height: 0; max-width: calc(100vw - 40px); max-height: 90vh; border: 0; border-radius: 12px; background: #fff; margin: auto; padding: 0; display: block; overflow-y: auto; overscroll-behavior: contain; box-shadow: 0 25px 90px #35234333; animation: toast-in .18s ease-out; backdrop-filter: none; }
 dialog.modal:not([open]) { display: none; }
 dialog.modal::backdrop { background: #30203966; backdrop-filter: blur(3px); }
 dialog.modal > div { width: auto; max-width: none; max-height: none; border-radius: 0; background: transparent; box-shadow: none; animation: none; overflow-y: visible; }
@@ -638,5 +638,13 @@ dialog.modal > div { width: auto; max-width: none; max-height: none; border-radi
 }
 .mobile-nav{display:none}
 @media(max-width:720px){.mobile-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;font-size:11px;color:#8e879b}.mobile-nav select{border:1px solid #e6e0ef;background:#fff;border-radius:6px;padding:7px 10px;font-size:12px;color:#695779;min-width:150px}}
+
+/* Portalled controls remain in the native dialog's top layer without inheriting its content-panel reset. */
+dialog.modal > [data-radix-popper-content-wrapper] { overflow: visible; }
+.account-context { width: 240px; max-width: 24vw; min-width: 0; }
+.account-context .exp-choice-trigger { min-height: 36px; padding: 7px 10px; font-size: 11px; }
+.mobile-nav > .exp-choice-field { width: 210px; max-width: 75%; }
+@media(max-width:1050px) { .account-context { width: 180px; } }
+@media(max-width:720px) { .account-context { width: 145px; max-width: 37vw; } .account-context .exp-choice-trigger { font-size: 10px; } }
 
 .mobile-demo{display:none}@media(max-width:720px){.mobile-demo{display:block;text-align:center;padding:5px 15px;background:#fbf9ff;border-bottom:1px solid #eee8f7;font-size:9px;color:#9983b2}}

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { applyAction, assertInvariants, DomainError, getPersona, projectWorkspace } from "../lib/domain";
+import { OperationError } from "../lib/operations";
 import { createSeed, shanghaiDate } from "../lib/seed";
 import { resolveOwner } from "../lib/request-auth";
 import type { WorkspaceData } from "../lib/types";
@@ -9,7 +10,7 @@ const NOW = new Date("2026-10-24T03:00:00Z");
 const seed = () => createSeed(NOW);
 const reserve = (data: WorkspaceData, classId = "cls-2", cardId = "card1", memberId = "m1") => applyAction(data, "student", "booking.create", { classId, cardId, memberId }, NOW);
 function rejects(fn: () => unknown, message: RegExp, status = 400) {
-  assert.throws(fn, (error: unknown) => error instanceof DomainError && error.status === status && message.test(error.message));
+  assert.throws(fn, (error: unknown) => (error instanceof DomainError || error instanceof OperationError) && error.status === status && message.test(error.message));
 }
 
 test("示例种子满足余额、冻结、容量与清分唯一性约束", () => {
@@ -108,12 +109,64 @@ test("教练未审核、资质开课日到期或科目不符均阻止预约", ()
 });
 
 const classPayload = { name: "周末训练", storeId: "s1", coachId: "c1", type: "力量训练", startAt: "2026-10-27T14:00", endAt: "2026-10-27T15:00", capacity: 10, credits: 1, price: 19800, room: "A 区" };
-test("排课接受上海本地时间并拒绝教练、场地冲突及跨店教练", () => {
+const issuePayload = { memberId: "m1", storeId: "s1", name: "力量训练课包", total: 3, amount: 90000, expiresAt: "2027-10-24", scope: "home", classTypes: ["力量训练"] };
+test("开卡与续卡凭证选填，多笔空凭证仍独立记账且续卡保留旧卡", () => {
+  const original = seed();
+  const first = applyAction(original, "hq", "card.issue", issuePayload, NOW);
+  const firstCard = first.cards[0];
+  const second = applyAction(first, "hq", "card.issue", { ...issuePayload, receipt: "   " }, NOW);
+  const renewed = applyAction(second, "hq", "card.renew", { ...issuePayload, id: firstCard.id }, NOW);
+  assert.equal(renewed.orders.length, 3);
+  assert.ok(renewed.orders.every(order => order.receipt === "" && order.amount === 90000));
+  assert.equal(new Set(renewed.orders.map(order => order.cardId)).size, 3);
+  assert.deepEqual(renewed.cards.find(card => card.id === firstCard.id), firstCard);
+  assert.deepEqual(renewed.ledger.map(entry => [entry.type, entry.credits, entry.remaining, entry.frozen, entry.amount]), Array.from({ length: 3 }, () => ["issue", 3, 3, 0, 90000]));
+  assert.equal(original.orders.length, 0);
+});
+test("非空收款凭证去空白后在同品牌拒绝重复，不占用其他品牌凭证", () => {
+  const issued = applyAction(seed(), "hq", "card.issue", { ...issuePayload, receipt: "  RECEIPT-001  " }, NOW);
+  assert.equal(issued.orders[0].receipt, "RECEIPT-001");
+  rejects(() => applyAction(issued, "hq", "card.issue", { ...issuePayload, storeId: "s2", receipt: "RECEIPT-001" }, NOW), /凭证已登记/);
+  rejects(() => applyAction(issued, "hq", "card.renew", { ...issuePayload, id: issued.cards[0].id, receipt: " RECEIPT-001 " }, NOW), /凭证已登记/);
+  const otherTenant = applyAction(issued, { ...getPersona("hq"), tenantId: "t2" }, "card.issue", { ...issuePayload, memberId: "m5", storeId: "s4", receipt: "RECEIPT-001" }, NOW);
+  assert.equal(otherTenant.orders.filter(order => order.receipt === "RECEIPT-001").length, 2);
+});
+test("开卡续卡可仅存凭证附件ID，不信任客户端附件元数据", () => {
+  const ids = ["receipt-test-a", "receipt-7c50c177-a8d2-418b-afd0-a05376923c0a"];
+  const issued = applyAction(seed(), "hq", "card.issue", { ...issuePayload, receiptAttachmentIds: ids, receiptAttachments: [{ id: "receipt-forged", name: "伪造凭证", mime: "image/png", size: 10 }] }, NOW);
+  assert.equal(issued.orders[0].receipt, "");
+  assert.deepEqual(issued.orders[0].receiptAttachmentIds, ids);
+  assert.notStrictEqual(issued.orders[0].receiptAttachmentIds, ids);
+  assert.equal(Object.hasOwn(issued.orders[0], "receiptAttachments"), false);
+  const renewed = applyAction(issued, "hq", "card.renew", { ...issuePayload, id: issued.cards[0].id, receiptAttachmentIds: ["receipt-renewal"] }, NOW);
+  assert.deepEqual(renewed.orders[0].receiptAttachmentIds, ["receipt-renewal"]);
+  assert.deepEqual(renewed.orders[1].receiptAttachmentIds, ids);
+});
+test("凭证附件拒绝非数组、非法ID、过多或重复ID且失败不产生订单", () => {
+  const original = seed();
+  for (const ids of ["receipt-a", [1], ["../receipt-a"], [`receipt-${"a".repeat(101)}`], ["receipt-a", "receipt-a"], ["receipt-a", "receipt-b", "receipt-c", "receipt-d"]]) {
+    rejects(() => applyAction(original, "hq", "card.issue", { ...issuePayload, receiptAttachmentIds: ids }, NOW), /有效凭证附件ID/);
+  }
+  assert.equal(original.orders.length, 0);
+  assert.equal(original.ledger.length, 0);
+  assert.equal(original.cards.length, 4);
+});
+test("选填开卡凭证仍校验类型长度，退款凭证保持必填", () => {
+  for (const receipt of [123, "a".repeat(201)]) rejects(() => applyAction(seed(), "hq", "card.issue", { ...issuePayload, receipt }, NOW), /最多200字/);
+  const issued = applyAction(seed(), "hq", "card.issue", issuePayload, NOW);
+  const order = issued.orders[0];
+  rejects(() => applyAction(issued, "hq", "order.refund", { id: order.id, receipt: " ", reason: "学员取消训练" }, NOW), /线下核验凭证/);
+  assert.equal(order.status, "paid");
+  const refunded = applyAction(issued, "hq", "order.refund", { id: order.id, receipt: "REFUND-001", reason: "学员取消训练" }, NOW);
+  assert.equal(refunded.orders[0].refundReceipt, "REFUND-001");
+  assert.equal(refunded.ledger.at(-1)!.type, "refund");
+});
+test("排课接受上海本地时间并拒绝教练、场地冲突及未关联门店教练", () => {
   const created = applyAction(seed(), "manager", "class.create", classPayload, NOW);
   assert.equal(created.classes.at(-1)!.startAt, "2026-10-27T06:00:00.000Z");
   rejects(() => applyAction(created, "manager", "class.create", { ...classPayload, room: "B 区" }, NOW), /已有课程/);
   rejects(() => applyAction(created, "manager", "class.create", { ...classPayload, coachId: "c3", type: "少儿体能" }, NOW), /已有课程/);
-  rejects(() => applyAction(seed(), "manager", "class.create", { ...classPayload, coachId: "c2", type: "瑜伽普拉提" }, NOW), /归属其他门店/);
+  rejects(() => applyAction(seed(), "manager", "class.create", { ...classPayload, coachId: "c2", type: "瑜伽普拉提" }, NOW), /未关联/,403);
   rejects(() => applyAction(seed(), "manager", "class.create", { ...classPayload, startAt: "2026-02-30T14:00" }, NOW), /有效日期/);
 });
 test("门店和教练不能通过替换ID操作其他门店或其他教练课程", () => {
@@ -169,7 +222,7 @@ test("角色读取按品牌、门店、家庭过滤且学员仍获得准确容�
   assert.ok(manager.members.some((m) => m.id === "m3"), "本店教练需要知道到访学员");
   assert.ok(manager.cards.some((c) => c.id === "card3"), "到访预约使用的卡可供门店履约");
   const coach = projectWorkspace(data, "coach", 1).data;
-  assert.ok(coach.classes.every((c) => c.coachId === "c1")); assert.equal(coach.cards.length, 0);
+  assert.ok(coach.classes.every((c) => c.coachId === "c1"));assert.ok(coach.cards.length > 0);assert.ok(coach.cards.every(card => coach.members.some(member => member.id === card.memberId) && !Object.hasOwn(card,"unitValueCents") && !Object.hasOwn(card,"orderId")));
   assert.equal(projectWorkspace(data, "platform", 1).data.tenants.length, 3);
 });
 test("总部任务完成幂等与定向公告过滤", () => {

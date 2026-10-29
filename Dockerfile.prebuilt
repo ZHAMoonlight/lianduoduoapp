@@ -1,0 +1,23 @@
+# Use deploy/package.mjs --prebuilt on the development machine first.
+# The destination only installs the small locked server dependency tree.
+ARG NODE_IMAGE=node:22-bookworm-slim
+FROM ${NODE_IMAGE} AS runtime-dependencies
+WORKDIR /runtime
+COPY deploy/runtime/package.json deploy/runtime/package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+
+FROM ${NODE_IMAGE} AS runtime
+ENV NODE_ENV=production HOST=0.0.0.0 API_PORT=3001
+WORKDIR /app
+COPY --chown=node:node deploy/runtime/package.json ./package.json
+COPY --from=runtime-dependencies --chown=node:node /runtime/node_modules ./node_modules
+COPY --chown=node:node .local-runtime ./.local-runtime
+COPY --chown=node:node dist-local/client ./dist-local/client
+COPY --chown=node:node server ./server
+COPY --chown=node:node local/env.mjs local/init-mysql.mjs ./local/
+COPY --chown=node:node deploy/start.mjs ./deploy/start.mjs
+USER node
+EXPOSE 3001
+HEALTHCHECK --interval=20s --timeout=5s --start-period=30s --retries=3 \
+    CMD node --input-type=module -e "try { const r=await fetch('http://127.0.0.1:'+(process.env.API_PORT||3001)+'/api/setup',{signal:AbortSignal.timeout(4000)}); process.exit(r.ok?0:1); } catch { process.exit(1); }"
+CMD ["node", "deploy/start.mjs"]

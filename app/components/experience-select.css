@@ -1,0 +1,76 @@
+.exp-choice-field { display: flex; flex-direction: column; gap: 7px; width: 100%; min-width: 0; position: relative; }
+.exp-choice-form-value,
+.modal-form .exp-choice-form-value,
+.modal-body .exp-choice-form-value { position: absolute; width: 1px; height: 1px; min-height: 0; padding: 0; margin: 0; border: 0; opacity: 0; pointer-events: none; }
+.exp-choice-error { color: #bd635e; font-size: 11px; line-height: 1.6; }
+.exp-choice-trigger,
+.exp-root .exp-choice-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+  min-height: 43px;
+  padding: 11px 13px;
+  border: 1px solid #e4deed;
+  border-radius: 10px;
+  background: #fff;
+  color: #51485f;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.5;
+  font-family: inherit;
+  text-align: left;
+  box-shadow: 0 1px 2px #51416f03;
+  transition: border-color .16s, box-shadow .16s, background .16s;
+}
+.exp-choice-trigger:hover,
+.exp-root .exp-choice-trigger:hover { border-color: #bcace7; background: #fcfbff; }
+.exp-choice-trigger:focus-visible,
+.exp-root .exp-choice-trigger:focus-visible,
+.exp-choice-trigger[data-state="open"],
+.exp-root .exp-choice-trigger[data-state="open"] { border-color: #9a83dc; outline: none; box-shadow: 0 0 0 3px #a78bda21; }
+.exp-choice-trigger[data-placeholder] { color: #92909f; }
+.exp-choice-trigger:disabled,
+.exp-root .exp-choice-trigger:disabled { color: #a7a1b1; background: #f7f6f9; border-color: #ebe7f0; box-shadow: none; cursor: not-allowed; opacity: 1; }
+.exp-choice-trigger[aria-invalid="true"] { border-color: #d68a83; }
+.exp-choice-value { display: block; flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.exp-choice-leading { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; color: #9e8eb6; }
+.exp-choice-leading > svg { width: 15px; height: 15px; }
+.exp-choice-chevron { margin-left: auto; color: #a596b8; flex-shrink: 0; transition: transform .16s; }
+.exp-choice-trigger[data-state="open"] .exp-choice-chevron { transform: rotate(180deg); color: #8068c5; }
+.exp-choice-popup {
+  z-index: 180;
+  width: var(--radix-select-trigger-width);
+  min-width: min(210px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  max-height: min(320px, var(--radix-select-content-available-height));
+  border: 1px solid #e7dff0;
+  border-radius: 13px;
+  background: #fff;
+  color: #51485f;
+  box-shadow: 0 14px 40px #51416f19, 0 3px 10px #51416f09;
+  overflow: hidden;
+  transform-origin: var(--radix-select-content-transform-origin);
+  animation: expChoiceIn .14s ease-out;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.exp-choice-viewport { padding: 6px; max-height: 308px; }
+.exp-choice-menu-label { color: #a397b0; font-size: 10px; letter-spacing: .2px; padding: 7px 9px 8px; }
+.exp-choice-item { display: flex; align-items: center; gap: 12px; position: relative; padding: 10px 11px; min-height: 38px; border-radius: 8px; cursor: default; user-select: none; outline: none; transition: background .12s; }
+.exp-choice-item[data-highlighted] { background: #f7f3fd; color: #6c51a2; }
+.exp-choice-item[data-state="checked"] { background: #f2ecfb; color: #7656b2; }
+.exp-choice-item[data-disabled] { color: #aba5b2; opacity: .8; }
+.exp-choice-item[data-disabled] .exp-choice-item-description { color: #b29d9f; }
+.exp-choice-item-copy { display: flex; flex: 1; flex-direction: column; min-width: 0; gap: 3px; }
+.exp-choice-item-label { overflow-wrap: anywhere; font-weight: 500; }
+.exp-choice-item-description { display: block; color: #a094ae; font-size: 10px; line-height: 1.7; overflow-wrap: anywhere; }
+.exp-choice-item-check { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 17px; color: #8767bd; }
+.exp-choice-scroll { display: flex; justify-content: center; align-items: center; color: #a08bb9; background: #fff; height: 23px; }
+.exp-choice-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; color: #a397b0; padding: 26px 14px; line-height: 1.8; }
+.exp-choice-empty > svg { color: #c1b2d2; }
+@keyframes expChoiceIn { from { opacity: 0; transform: translateY(-3px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .exp-choice-popup { animation: none; } .exp-choice-trigger, .exp-choice-chevron { transition: none; } }

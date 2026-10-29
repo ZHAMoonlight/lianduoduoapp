@@ -1,0 +1,71 @@
+name: lianduoduo-production
+
+x-database: &database
+  MYSQL_HOST: ${MYSQL_DOCKER_HOST:-${MYSQL_HOST:?Set MYSQL_HOST in .env.prod}}
+  MYSQL_PORT: ${MYSQL_PORT:-3306}
+  MYSQL_DATABASE: ${MYSQL_DATABASE:?Set MYSQL_DATABASE in .env.prod}
+  MYSQL_USER: ${MYSQL_USER:?Set MYSQL_USER in .env.prod}
+  MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env.prod}
+  MYSQL_CONNECTION_LIMIT: ${MYSQL_CONNECTION_LIMIT:-10}
+
+services:
+  schema-init:
+    image: lianduoduo-app:${APP_IMAGE_TAG:?Set APP_IMAGE_TAG}
+    profiles: [initialize]
+    restart: "no"
+    environment:
+      <<: *database
+      DB_CLIENT: mysql
+      MYSQL_SCHEMA_USER: ${MYSQL_SCHEMA_USER:-}
+      MYSQL_SCHEMA_PASSWORD: ${MYSQL_SCHEMA_PASSWORD:-}
+      MYSQL_INITIALIZE_AS_ADMIN: ${MYSQL_INITIALIZE_AS_ADMIN:-false}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-}
+      MYSQL_CREATE_DATABASE: ${MYSQL_CREATE_DATABASE:-false}
+      NODE_OPTIONS: --max-old-space-size=64
+    command: [node, deploy/init-external-mysql.mjs]
+    volumes:
+      - ${EXTERNAL_MYSQL_INIT_SCRIPT:-./deploy/init-external-mysql.mjs}:/app/deploy/init-external-mysql.mjs:ro
+    networks: [application]
+    extra_hosts: [host.docker.internal:host-gateway]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck: {disable: true}
+    mem_limit: 128m
+    memswap_limit: 128m
+
+  app:
+    image: lianduoduo-app:${APP_IMAGE_TAG:?Set APP_IMAGE_TAG}
+    restart: unless-stopped
+    init: true
+    environment:
+      <<: *database
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      API_PORT: 3001
+      DB_CLIENT: mysql
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-https://lianduoduo.aiapaas.com}
+      TRUSTED_PROXY_IPS: ${TRUSTED_PROXY_IPS:-}
+      SETUP_TOKEN: ${SETUP_TOKEN:?Set SETUP_TOKEN}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://lianduoduo.aiapaas.com}
+      NODE_OPTIONS: --max-old-space-size=${NODE_MAX_OLD_SPACE_MB:-128}
+      WECHAT_APP_ID: ${WECHAT_APP_ID:-}
+      WECHAT_APP_SECRET: ${WECHAT_APP_SECRET:-}
+      WECHAT_PHONE_LOGIN_ENABLED: ${WECHAT_PHONE_LOGIN_ENABLED:-false}
+      WECHAT_API_TIMEOUT_MS: ${WECHAT_API_TIMEOUT_MS:-10000}
+    ports:
+      - "127.0.0.1:${APP_BIND_PORT:-43101}:3001"
+    networks: [application]
+    extra_hosts: [host.docker.internal:host-gateway]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 256
+    stop_grace_period: 30s
+    mem_limit: ${APP_MEMORY_LIMIT:-256m}
+    memswap_limit: ${APP_MEMORY_LIMIT:-256m}
+
+networks:
+  application:

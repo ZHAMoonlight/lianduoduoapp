@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>国内竞品调研 · 教练/门店约课 SaaS</title>
+<style>
+  :root {
+    --ink: #1a1d26; --ink-2: #4a4f5e; --ink-3: #8a8fa0;
+    --bg: #f7f7f9; --card: #fff; --line: #e6e8ee;
+    --accent: #3b5bfd; --accent-soft: #eef1ff;
+    --green: #0e9f6e; --green-soft: #e6f7f0;
+    --red: #d64545; --red-soft: #fdeeee;
+    --amber: #b7791f; --amber-soft: #fdf3e3;
+    --wx: #07c160; --wx-soft: #e8f9f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.7; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 48px 28px 80px; }
+  .kicker { color: var(--accent); font-weight: 600; letter-spacing: 2px; font-size: 13px; margin-bottom: 8px; }
+  h1 { font-size: 30px; margin-bottom: 10px; }
+  .meta { color: var(--ink-3); font-size: 13px; }
+  h2 { font-size: 21px; margin: 44px 0 16px; padding-top: 24px; border-top: 1px solid var(--line); }
+  h3 { font-size: 16px; margin: 18px 0 8px; }
+  p { margin-bottom: 12px; color: var(--ink-2); }
+
+  .verdict { background: linear-gradient(120deg, #d64545, #b03232); border-radius: 16px; color: #fff; padding: 22px 26px; margin: 20px 0; }
+  .verdict b { font-size: 16.5px; display: block; margin-bottom: 6px; }
+  .verdict p { color: rgba(255,255,255,.9); margin: 0; font-size: 14px; }
+
+  /* 阵营卡片 */
+  .camp { border: 1px solid var(--line); border-radius: 14px; background: var(--card); padding: 18px 22px; margin: 14px 0; }
+  .camp h3 { margin-top: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tag { display: inline-block; font-size: 12px; padding: 1px 10px; border-radius: 20px; font-weight: 600; }
+  .tg { background: var(--green-soft); color: var(--green); }
+  .tb { background: var(--accent-soft); color: var(--accent); }
+  .to { background: var(--amber-soft); color: var(--amber); }
+  .tr { background: var(--red-soft); color: var(--red); }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; font-size: 13px; }
+  th { background: var(--accent-soft); text-align: left; padding: 9px 12px; font-weight: 600; }
+  td { padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; color: var(--ink-2); }
+  td b { color: var(--ink); }
+  .callout { border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 16px 0; color: var(--ink-2); }
+  .callout.warn { border-color: var(--red); background: var(--red-soft); }
+  .callout.ok { border-color: var(--green); background: var(--green-soft); }
+  ul { margin: 0 0 12px 20px; color: var(--ink-2); }
+  li { margin-bottom: 5px; }
+  /* 价格带图 */
+  .price-band { position: relative; height: 118px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin: 18px 0; }
+  .band-line { position: absolute; top: 34px; left: 30px; right: 30px; height: 6px; border-radius: 4px; background: linear-gradient(90deg, #0e9f6e, #3b5bfd 40%, #b7791f 70%, #d64545); }
+  .band-dot { position: absolute; top: 12px; transform: translateX(-50%); text-align: center; width: 120px; }
+  .band-dot .d { width: 14px; height: 14px; border-radius: 50%; margin: 16px auto 0; border: 3px solid #fff; box-shadow: 0 1px 6px rgba(0,0,0,.25); }
+  .band-dot .lbl { font-size: 11px; color: var(--ink-2); font-weight: 600; line-height: 1.3; }
+  .band-dot .pr { font-size: 10.5px; color: var(--ink-3); }
+  .band-axis { position: absolute; bottom: 10px; left: 30px; right: 30px; display: flex; justify-content: space-between; font-size: 10.5px; color: var(--ink-3); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="kicker">COMPETITIVE LANDSCAPE · 国内竞品调研</div>
+<h1>国内竞品调研：教练/门店约课 SaaS</h1>
+<div class="meta">调研时间：2026-10-24 · 结论先行：<b>赛道比预想拥挤，但存在明确的差异化空隙</b></div>
+
+<div class="verdict">
+  <b>⚠️ 先说扎心的结论：这个赛道不是空白市场。</b>
+  <p>① 有 <b>50,000+ 场馆在用的成熟头部</b>（三体云动，连锁能力强 + 智能硬件生态）；② 有 <b>免费产品</b>（一喵约课，基础约课不收钱）在收割小场馆；③ 有校宝在线（22 万校区）这类教培巨头做"多校区管理"。但好消息是：竞品普遍是<b>"管理工具"思维</b>，几乎没有人在做<b>"帮教练/门店智能经营"（AI 流失预警、续费时机）和"教练个人获客"</b>——这就是空隙。</p>
+</div>
+
+<h2>一、五大竞品阵营全景</h2>
+
+<div class="camp">
+  <h3>阵营 ① 健身场馆垂直 SaaS（最直接竞品）<span class="tag tb">正面竞争</span></h3>
+  <table>
+    <tr><th>产品</th><th>定价</th><th>定位与规模</th><th>优势</th><th>短板</th></tr>
+    <tr><td><b>三体云动</b></td><td>1,800–10,000 元/年，连锁按店阶梯</td><td>行业头部，宣称 50,000+ 场馆；连锁俱乐部/工作室/瑜伽/少儿运动全覆盖</td><td>连锁管控成熟、AIoT 硬件生态（门禁/闸机/体测）、ISO27001、支持买断、数据迁移服务</td><td>重、贵、小程序装修自由度低、营销工具偏弱；小馆觉得"杀鸡用牛刀"</td></tr>
+    <tr><td><b>勤鸟</b></td><td>1,500–3,600 元/年</td><td>健身垂直，中大连锁</td><td>团课/私教排课精细、硬件联动、大客流稳定</td><td>对小微场馆功能冗余、定价偏高</td></tr>
+    <tr><td><b>菲特云 / 青橙 / 微健</b></td><td>1,200–5,000 元/年</td><td>健身/瑜伽腰部品牌</td><td>卡项到期预警、续课提醒做得细</td><td>品牌声量小、案例少</td></tr>
+    <tr><td><b>健总管</b></td><td>999–1,999 元/年</td><td>轻量健身 SaaS</td><td>提成模板丰富、上手快、便宜</td><td>多门店弱、无营销裂变</td></tr>
+  </table>
+</div>
+
+<div class="camp">
+  <h3>阵营 ② 免费/低价轻量约课工具<span class="tag tr">最大威胁：低价绞杀</span></h3>
+  <table>
+    <tr><th>产品</th><th>定价</th><th>定位</th><th>优势</th><th>短板</th></tr>
+    <tr><td><b>一喵约课</b></td><td><b>基础功能免费</b></td><td>瑜伽/舞蹈/小型工作室，"免费好用"心智</td><td>零成本起步、极简（62 岁会员一次学会）、课表/候补/核销/提醒齐全、数据可导出</td><td>无复杂报表/门禁/连锁深度；免费后靠增值和定制变现</td></tr>
+    <tr><td><b>松果约课</b></td><td>365 元/年起</td><td>小微运动场馆</td><td>极简、手机端全操作、无隐形消费</td><td>功能仅覆盖基础刚需</td></tr>
+    <tr><td><b>廷书 / 瑜小九</b></td><td>580–2,500 元/年</td><td>多校区课时通用/瑜伽垂直</td><td>请假补课灵活、细分场景贴合</td><td>连锁管控弱、营销单一</td></tr>
+  </table>
+  <div class="callout warn"><b>影响判断：</b>我们原方案的"免费版铺量"钩子会被一喵约课的<b>完全免费</b>压制；99–199 元/月（约 1,200–2,400 元/年）的会员定价正好落在三体云动和松果之间的"死亡地带"——<b>必须靠免费版给不了的差异化价值收钱，而不是靠基础约课功能收钱。</b></div>
+</div>
+
+<div class="camp">
+  <h3>阵营 ③ 教培教务 SaaS（少儿场景竞品）<span class="tag to">少儿体适能赛道正面撞上</span></h3>
+  <table>
+    <tr><th>产品</th><th>定价</th><th>定位与规模</th><th>优势</th><th>短板</th></tr>
+    <tr><td><b>校宝在线</b></td><td>按校区/模块报价，中高价</td><td>教培 SaaS 巨头：22 万+ 校区、累计服务 1 亿用户、蚂蚁生态</td><td>招生/教务/财务/保险/赛事考级全链路、多校区管理成熟、人脸考勤硬件</td><td>为学科/艺培设计，运动场馆约课体验不是重点；重、贵</td></tr>
+    <tr><td><b>爱耕云</b></td><td>数千元/年</td><td>素质教育垂直，明确主打体适能/武术/棋类</td><td>按年龄段课程体系、自动升班、家长端作品相册（转介绍抓手）</td><td>品牌小、成人运动场景不适配</td></tr>
+    <tr><td><b>小麦助教</b></td><td>数千元/年</td><td>K12/艺培起家</td><td>家长端体验好（课后反馈→续费）</td><td>运动场馆约课场景弱</td></tr>
+  </table>
+</div>
+
+<div class="camp">
+  <h3>阵营 ④ 平台型（自带流量，抽成模式）<span class="tag to">模式不同，间接竞争</span></h3>
+  <p><b>乐刻商家系统</b>：门店入驻合作制、按流水抽成，24 小时自助健身场景成熟、自带平台流量——但商家自主权有限，不适合独立私教工作室。<b>超级猩猩/Shape 类</b>是自建闭环不出售。平台型的存在说明：场馆要的是"自主经营工具"，不是"被平台抽成"——这反而验证了 SaaS 订阅模式的空间。</p>
+</div>
+
+<div class="camp">
+  <h3>阵营 ⑤ 通用建站/电商型（长尾搅局者）<span class="tag tg">威胁较低</span></h3>
+  <p><b>乔拓云</b>（699–2,799 元/年，买 2 送 2，SEO 软广铺满全网）、有赞/微盟（卖课电商基因，"管"的能力弱）。特点：低价+营销猛+通用模板，健身理解浅。它们教育了市场，但做不深。</p>
+</div>
+
+<h2>二、价格带地图</h2>
+<div class="price-band">
+  <div class="band-line"></div>
+  <div class="band-dot" style="left:12%"><div class="d" style="background:var(--green)"></div><div class="lbl">松果/廷书</div><div class="pr">365–580/年</div></div>
+  <div class="band-dot" style="left:24%"><div class="d" style="background:var(--wx)"></div><div class="lbl">一喵约课</div><div class="pr">免费</div></div>
+  <div class="band-dot" style="left:40%"><div class="d" style="background:var(--accent)"></div><div class="lbl">我们原定价</div><div class="pr">1,188–2,388/年</div></div>
+  <div class="band-dot" style="left:55%"><div class="d" style="background:#8a8fa0"></div><div class="lbl">健总管/菲特云</div><div class="pr">999–2,000/年</div></div>
+  <div class="band-dot" style="left:72%"><div class="d" style="background:var(--amber)"></div><div class="lbl">乔拓云/勤鸟</div><div class="pr">1,500–3,600/年</div></div>
+  <div class="band-dot" style="left:90%"><div class="d" style="background:var(--red)"></div><div class="lbl">三体云动/校宝</div><div class="pr">3,000–10,000+/年</div></div>
+  <div class="band-axis"><span>便宜</span><span>—— 约 1,000–2,000 元/年是红海主体 ——</span><span>贵</span></div>
+</div>
+
+<h2>三、竞品没做好的三件事 = 我们的机会</h2>
+<ul>
+  <li><b>① 全行业都在做"记录系统"，没人做"经营大脑"。</b>竞品的"智能"停留在到期提醒、冲突检测。没有一家在做：<b>AI 流失预测（谁 3 周后会流失）、续费时机推荐（谁刚破 PR 该谈续费了）、给老板的经营建议</b>。这是 AI 时代做新产品的天然代差。</li>
+  <li><b>② 立场都在"场馆老板"，没人服务"教练个人"。</b>教练在所有系统里只是被排班、被统计提成的一方。一个帮<b>独立教练建立个人品牌、管理私教学员、自动催续费</b>的工具（教练即老板），是人群空白——全国几百万健身/瑜伽/舞蹈教练，且逐年增长。</li>
+  <li><b>③ 连锁版的跨店清分是真空白。</b>三体云动连锁版强在"管控"，但<b>加盟模式的跨店课时结算、清分对账</b>（我们方案里的核心功能）普遍做得浅——恰恰是连锁品牌最痛的地方。</li>
+</ul>
+
+<h2>四、对我们方案的四个修正建议</h2>
+<div class="callout warn">
+<b>① 定价重校准：</b>免费版仍有必要（对抗一喵），但付费点必须建立在"免费竞品给不了"的东西上——<b>AI 经营助手、流失预警、连锁清分</b>。会员版建议对标竞品主流价（1,200–2,000 元/年），不要定价高于三体云动单店版。<br><br>
+<b>② 差异化主轴改为"教练侧"：</b>从"门店管理工具"升级为"<b>教练的经营助手 + 个人品牌工具</b>"——帮教练发课表主页、学员扫码直接约"这个教练"（而不是约场馆）、教练提成/学员关系归教练。先赢教练心智，教练再反向带来门店客户（自下而上打法，避开和三体云动的正面战）。<br><br>
+<b>③ 切入细分首选少儿体育培训：</b>爱耕云证明了体适能是真实需求，但它品牌小、家长端浅；校宝太重太贵。<b>"少儿体育 + 家长端深度（成长报告/课堂照片/续费 SOP）"是竞品交叠的薄弱带。</b><br><br>
+<b>④ MVP 验证问题要更新：</b>之前方案里"你愿意为约课工具付 99 元/月吗"这个问题已经失效——竞品证明了大家只愿为"基础约课"付 0–365 元/年。现在要验证的是："你愿意为<b>流失预警和续费助手</b>付 99 元/月吗？"——如果答案是否定的，这个项目要认真重新评估，或者把定价锚到 365–600 元/年的轻量档。
+</div>
+
+<div class="callout ok">
+<b>最终判断：</b>约课管理功能本身已是 commodity（商品化），直接做"又一个约课小程序"没有机会。可行的定位是三条之一：<b>A. 教练个人经营工具</b>（人群空白，自下而上）；<b>B. 少儿体育培训垂直 + 深度家长端</b>（细分空白）；<b>C. 连锁加盟清分专精</b>（功能空白，但要啃销售）。建议用两周时间拿 A 和 B 去做 20 个教练/馆主的访谈，让市场选。
+</div>
+
+<h2>五、主要信息来源</h2>
+<ul style="font-size:12.5px;color:var(--ink-3)">
+  <li>三体云动官网及 FAQ（styd.cn）：定价区间、50,000+ 场馆、AIoT 生态、连锁支持</li>
+  <li>乔拓云系列测评文（2026 健身约课系统排行）：勤鸟/青橙/松果/廷书价格与定位（注：乔拓云自身为竞品，其榜单立场需打折）</li>
+  <li>固乔网瑜伽约课系统盘点：瑜小九、菲特云、勤鸟定价细节</li>
+  <li>公众号实测评文《约课系统哪个好》：一喵约课免费模式、小麦助教/微健/三体云动真实使用体验</li>
+  <li>校宝在线官网：22 万校区、蚂蚁生态、全链路功能</li>
+  <li>爱耕云官网：体适能机构场景（按年龄课程体系/自动升班/家长端）</li>
+  <li>建站100：约课小程序市场价结构（模板版/SaaS 版/定制版）</li>
+</ul>
+
+</div>
+</body>
+</html>

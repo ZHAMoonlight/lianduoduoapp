@@ -43,3 +43,10 @@ yarn-error.log*
 
 # OS metadata
 .DS_Store
+
+# Local application database, generated domain runtime and build
+/data/
+/.local-runtime/
+/dist-local/
+!.env.example
+!.env.production.example

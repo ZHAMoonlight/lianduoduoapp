@@ -18,7 +18,7 @@ export function createSeed(now = new Date()): WorkspaceData {
   const stamp = now.toISOString();
   const expiry = shanghaiDate(now, 180);
   return {
-    demo: true, createdAt: stamp,
+    demo: true, createdAt: stamp, orders: [], ledger: [], followups: [], feedback: [], accounts: [],
     tenants: [
       { id: "t1", name: "力速健身", contact: "许知远", phone: "13800138001", plan: "专业版", status: "active", expiresAt: shanghaiDate(now, 300), createdAt: at(now, -150, "09:00") },
       { id: "t2", name: "星河艺术", contact: "周芸", phone: "13900139001", plan: "基础版", status: "active", expiresAt: shanghaiDate(now, 90), createdAt: at(now, -40, "09:00") },

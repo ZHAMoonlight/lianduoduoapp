@@ -1,0 +1,118 @@
+name: lianduoduo-production
+
+x-app-image: &app-image
+  image: lianduoduo-app:${APP_IMAGE_TAG:-latest}
+  build:
+    context: .
+    dockerfile: ${APP_DOCKERFILE:-Dockerfile}
+    target: runtime
+    args:
+      NODE_IMAGE: ${NODE_IMAGE:-node:22-bookworm-slim}
+
+x-database: &database
+  MYSQL_HOST: mysql
+  MYSQL_PORT: 3306
+  MYSQL_DATABASE: ${MYSQL_DATABASE:-lianduoduo}
+  MYSQL_USER: ${MYSQL_USER:-lianduoduo}
+  MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env.production}
+  MYSQL_CONNECTION_LIMIT: ${MYSQL_CONNECTION_LIMIT:-10}
+
+services:
+  mysql:
+    image: ${MYSQL_IMAGE:-mysql:8.4}
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-lianduoduo}
+      MYSQL_USER: ${MYSQL_USER:-lianduoduo}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env.production}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env.production}
+      MYSQL_ROOT_HOST: "%"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_bin
+      - --max-allowed-packet=16M
+      - --innodb-buffer-pool-size=64M
+      - --innodb-log-buffer-size=8M
+      - --innodb-redo-log-capacity=64M
+      - --max-connections=30
+      - --performance-schema=OFF
+      - --table-open-cache=256
+      - --thread-cache-size=4
+      - --tmp-table-size=8M
+      - --max-heap-table-size=8M
+      - --temptable-max-ram=32M
+      - --skip-name-resolve
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks: [database]
+    mem_limit: ${MYSQL_MEMORY_LIMIT:-512m}
+    memswap_limit: ${MYSQL_MEMORY_LIMIT:-512m}
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$${MYSQL_PASSWORD}\" mysql --protocol=TCP -h127.0.0.1 -u\"$${MYSQL_USER}\" --database=\"$${MYSQL_DATABASE}\" --silent --execute='SELECT 1' >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+      start_period: 20s
+
+  db-init:
+    <<: *app-image
+    restart: "no"
+    environment:
+      <<: *database
+      DB_CLIENT: mysql
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env.production}
+      MYSQL_SCHEMA_USER: root
+      NODE_OPTIONS: --max-old-space-size=64
+    command: ["node", "local/init-mysql.mjs"]
+    depends_on:
+      mysql: {condition: service_healthy}
+    networks: [database]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck: {disable: true}
+    mem_limit: 128m
+    memswap_limit: 128m
+
+  app:
+    <<: *app-image
+    restart: unless-stopped
+    init: true
+    environment:
+      <<: *database
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      API_PORT: 3001
+      DB_CLIENT: mysql
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-https://lianduoduo.aiapaas.com}
+      TRUSTED_PROXY_IPS: ${TRUSTED_PROXY_IPS:-}
+      SETUP_TOKEN: ${SETUP_TOKEN:?Set SETUP_TOKEN in .env.production}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://lianduoduo.aiapaas.com}
+      NODE_OPTIONS: --max-old-space-size=${NODE_MAX_OLD_SPACE_MB:-128}
+      WECHAT_APP_ID: ${WECHAT_APP_ID:-}
+      WECHAT_APP_SECRET: ${WECHAT_APP_SECRET:-}
+      WECHAT_PHONE_LOGIN_ENABLED: ${WECHAT_PHONE_LOGIN_ENABLED:-false}
+      WECHAT_API_TIMEOUT_MS: ${WECHAT_API_TIMEOUT_MS:-10000}
+    depends_on:
+      mysql: {condition: service_healthy}
+      db-init: {condition: service_completed_successfully}
+    ports:
+      - "127.0.0.1:${APP_BIND_PORT:-43101}:3001"
+    networks: [database, application]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 256
+    stop_grace_period: 30s
+    mem_limit: ${APP_MEMORY_LIMIT:-256m}
+    memswap_limit: ${APP_MEMORY_LIMIT:-256m}
+
+volumes:
+  mysql_data:
+
+networks:
+  database:
+    internal: true
+  application:

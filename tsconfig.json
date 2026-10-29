@@ -48,6 +48,8 @@
     ".wrangler",
     ".sites-runtime",
     "outputs",
-    "work"
+    "work",
+    ".local-runtime",
+    "dist-local"
   ]
 }

@@ -1,0 +1,12 @@
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { compileLocalDomain } from '../scripts/compile-local.mjs';
+import { loadLocalEnvironment, projectRoot } from './env.mjs';
+import { syncMiniProgramConfig } from './miniprogram.mjs';
+loadLocalEnvironment();
+process.chdir(projectRoot);
+syncMiniProgramConfig();
+compileLocalDomain();
+const result = spawnSync(process.execPath, [fileURLToPath(new URL('../node_modules/vite/bin/vite.js', import.meta.url)), 'build', '--config', 'vite.local.config.ts'], { stdio: 'inherit', env: process.env });
+if (result.error) throw result.error;
+process.exitCode = result.status ?? 1;

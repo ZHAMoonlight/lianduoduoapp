@@ -1,0 +1,29 @@
+name: lianduoduo
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: lianduoduo-mysql
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MYSQL_PORT:-43306}:3306"
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-lianduoduo}
+      MYSQL_USER: ${MYSQL_USER:-lianduoduo}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_ROOT_HOST: "%"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_bin
+      - --max-allowed-packet=64M
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$${MYSQL_PASSWORD}\" mysql --protocol=TCP -h127.0.0.1 -u\"$${MYSQL_USER}\" --database=\"$${MYSQL_DATABASE}\" --silent --execute='SELECT 1' >/dev/null"]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+      start_period: 15s
+volumes:
+  mysql_data:
+    name: lianduoduo_mysql_data
